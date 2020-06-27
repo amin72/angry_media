@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'corsheaders',
 
     # local apps
+    'user.apps.UserConfig',
     'post.apps.PostConfig',
 ]
 
