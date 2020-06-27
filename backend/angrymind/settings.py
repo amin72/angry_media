@@ -11,16 +11,20 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 """
 
 import os
+import json
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
 
+settings_path = os.path.join(PROJECT_DIR, 'settings.json')
+env_setttings = json.load(open(settings_path))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '594=rpp60b+f$xt!2gvz#bc#cpg5^s$+)8ze^fyoy(3n74lb#+'
+SECRET_KEY = env_setttings['SECRET_KEY']
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -81,8 +85,12 @@ WSGI_APPLICATION = 'angrymind.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': env_setttings['DATABASE_BACKEND'],
+        'NAME': env_setttings['NAME'],
+        'USER': env_setttings['USER'],
+        'PASSWORD': env_setttings['PASSWORD'],
+        'HOST': env_setttings['HOST'],
+        'PORT': env_setttings['PORT'],
     }
 }
 

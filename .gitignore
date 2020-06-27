@@ -21,3 +21,4 @@ media/
 logfile*
 backend/.coverage
 vene/*
+settings.json
