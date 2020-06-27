@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'corsheaders',
 
     # local apps
+    'post.apps.PostConfig',
 ]
 
 MIDDLEWARE = [
