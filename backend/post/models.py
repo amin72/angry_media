@@ -7,8 +7,6 @@ from django.contrib.contenttypes.models import ContentType
 from django.conf import settings
 
 
-User = get_user_model()
-
 COMMENT_MAX_LENGTH = getattr(settings, 'COMMENT_MAX_LENGTH', 3000)
 
 
@@ -35,7 +33,7 @@ class Category(models.Model):
 class Image(models.Model):
     """Image model represent elements of a post"""
 
-    owner = models.ForeignKey("user.CustomUser",
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL,
         verbose_name=_("owner"),
         on_delete=models.DO_NOTHING)
 
@@ -80,7 +78,7 @@ class Image(models.Model):
 class Post(models.Model):
     """Post model represent collections of elements"""
 
-    owner = models.ForeignKey("user.CustomUser",
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL,
         verbose_name=_("owner"),
         on_delete=models.DO_NOTHING)
 
