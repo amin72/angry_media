@@ -2,9 +2,14 @@ from django.db import models
 from django.contrib.auth import get_user_model
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
+from django.conf import settings
 
 
 User = get_user_model()
+
+COMMENT_MAX_LENGTH = getattr(settings, 'COMMENT_MAX_LENGTH', 3000)
 
 
 class Category(models.Model):
@@ -99,3 +104,47 @@ class Post(models.Model):
         verbose_name = _('Post')
         verbose_name_plural = _('Posts')
         ordering = ['-created']
+
+
+
+class Comment(models.Model):
+    """Comment model represents users' comments on the website"""
+
+    content_type = models.ForeignKey(ContentType,
+        verbose_name=_('content type'),
+        related_name="content_type_set_for_%(class)s",
+        on_delete=models.CASCADE)
+
+    object_pk = models.TextField(_('object ID'))
+    content_object = GenericForeignKey("content_type", "object_pk")
+
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,
+        verbose_name=_('user'),
+        blank=True,
+        null=True,
+        related_name="%(class)s_comments",
+        on_delete=models.SET_NULL)
+
+    content = models.CharField(_('content'), max_length=COMMENT_MAX_LENGTH)
+
+    is_removed = models.BooleanField(_('is removed'), default=False,
+        help_text=_('Check this box if the comment is inappropriate. '
+                    'A "This comment has been removed" message will '
+                    'be displayed instead.'))
+
+
+    ip_address = models.GenericIPAddressField(_('IP address'),
+        unpack_ipv4=True,
+        blank=True,
+        null=True)
+
+    created = models.DateTimeField(_("create"), auto_now_add=True)
+    updated = models.DateTimeField(_("create"), auto_now=True)
+
+    def __str__(self):
+        return f"{self.user.username}: {self.content[:50]}..."
+
+    class Meta:
+        verbose_name = _('comment')
+        verbose_name_plural = _('comments')
+        ordering = ['created']
