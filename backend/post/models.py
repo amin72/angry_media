@@ -30,12 +30,47 @@ class Category(models.Model):
 
 
 
+class Post(models.Model):
+    """Post model represent collections of elements"""
+
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL,
+        verbose_name=_("owner"),
+        on_delete=models.DO_NOTHING)
+
+    title = models.CharField(_("title"), max_length=250, null=True, blank=True)
+
+    description = models.CharField(_("description"),
+        max_length=4096,
+        null=True,
+        blank=True)
+    
+    is_active = models.BooleanField(_("is active"), default=False)
+    created = models.DateTimeField(_("create"), auto_now_add=True)
+    updated = models.DateTimeField(_("create"), auto_now=True)
+
+    def __str__(self):
+        return f'{self.id} - {self.owner.username}'
+
+    class Meta:
+        verbose_name = _('Post')
+        verbose_name_plural = _('Posts')
+        ordering = ['-created']
+
+
+
 class Image(models.Model):
     """Image model represent elements of a post"""
 
     owner = models.ForeignKey(settings.AUTH_USER_MODEL,
         verbose_name=_("owner"),
         on_delete=models.DO_NOTHING)
+
+    post = models.ForeignKey("post.Post",
+        related_name='images',
+        verbose_name=_("post"),
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True)
 
     title = models.CharField(_("title"), max_length=250, null=True, blank=True)
 
@@ -55,52 +90,30 @@ class Image(models.Model):
         null=True,
         blank=True)
 
+    image_height = models.PositiveIntegerField(_("Image Height"), default=500)
+    image_width = models.PositiveIntegerField(_("Image Width"), default=500)
+
     image = models.ImageField(_("image"),
         upload_to="images/%Y/%m/%d/",
-        height_field=500,
-        width_field=500)
-
+        height_field='image_height',
+        width_field='image_width')
+    
     is_active = models.BooleanField(_("is active"), default=False)
     total_views = models.PositiveIntegerField(_("total views"), default=0)
     created = models.DateTimeField(_("create"), auto_now_add=True)
     updated = models.DateTimeField(_("create"), auto_now=True)
 
+    def save(self, *args, **kwargs):
+        print(args)
+        print(kwargs)
+        return super().save(*args, **kwargs)
+
     def __str__(self):
-        return self.owner.username
+        return f'{self.id} - {self.owner.username}'
 
     class Meta:
         verbose_name = _('Image')
         verbose_name_plural = _('Images')
-        ordering = ['-created']
-
-
-
-class Post(models.Model):
-    """Post model represent collections of elements"""
-
-    owner = models.ForeignKey(settings.AUTH_USER_MODEL,
-        verbose_name=_("owner"),
-        on_delete=models.DO_NOTHING)
-
-    title = models.CharField(_("title"), max_length=250, null=True, blank=True)
-
-    description = models.CharField(_("description"),
-        max_length=4096,
-        null=True,
-        blank=True)
-
-    images = models.ManyToManyField("post.Image", verbose_name=_("images"))
-
-    is_active = models.BooleanField(_("is active"), default=False)
-    created = models.DateTimeField(_("create"), auto_now_add=True)
-    updated = models.DateTimeField(_("create"), auto_now=True)
-
-    def __str__(self):
-        return self.owner.username
-
-    class Meta:
-        verbose_name = _('Post')
-        verbose_name_plural = _('Posts')
         ordering = ['-created']
 
 
