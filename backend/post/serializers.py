@@ -52,13 +52,32 @@ class ImageSerializer(serializers.HyperlinkedModelSerializer):
 
 
 
+class ImagePublishedSerializer(serializers.ModelSerializer):
+    category = serializers.SlugRelatedField(
+        slug_field='slug',
+        queryset=Category.objects.all()
+    )
+
+    class Meta:
+        model = Image
+        fields = [
+            'title',
+            'owner_description',
+            'admin_description',
+            'category',
+            'image',
+            'total_views',
+        ]
+        
+        read_only_fields = [
+            'admin_description',
+            'total_views'
+        ]
+
+
 class PostSerializer(serializers.ModelSerializer):
     owner = serializers.StringRelatedField()
-    images = serializers.HyperlinkedRelatedField(
-        many=True,
-        read_only=True,
-        view_name='post:image_user-detail'
-    )
+    images = ImagePublishedSerializer(many=True)
 
     class Meta:
         model = Post
