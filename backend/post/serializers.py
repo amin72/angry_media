@@ -54,7 +54,7 @@ class PostSerializer(serializers.ModelSerializer):
     images = serializers.HyperlinkedRelatedField(
         many=True,
         read_only=True,
-        view_name='post:image-detail'
+        view_name='post:image_user-detail'
     )
 
     class Meta:
@@ -74,10 +74,57 @@ class PostSerializer(serializers.ModelSerializer):
             'updated'
         ]
 
-    # def get_images(self, obj):
-    #     request = self.context['request']
 
-    #     return {
-    #         'images': reverse('post:image-list', request=request) + 
-    #                             '?post={}'.format(obj.pk)
-    #     }
+
+class PostManageSerializer(serializers.HyperlinkedModelSerializer):
+    owner = serializers.StringRelatedField()
+    url = serializers.HyperlinkedIdentityField(
+        view_name='post:post_manage-detail')
+
+    class Meta:
+        model = Post
+        fields = [
+            'owner',
+            'title',
+            'description',
+            'is_active',
+            'created',
+            'updated',
+            'url'
+        ]
+        
+        read_only_fields = [
+            'owner',
+            'created',
+            'updated'
+        ]
+
+
+
+class ImageManageSerializer(serializers.HyperlinkedModelSerializer):
+    owner = serializers.StringRelatedField()
+    url = serializers.HyperlinkedIdentityField(
+        view_name='post:post_manage-detail')
+
+    class Meta:
+        fields = [
+            'owner',
+            'title',
+            'owner_description',
+            'admin_description',
+            'is_active',
+            'category',
+            'image',
+            'created',
+            'updated',
+            'post',
+            'total_views',
+            'url'
+        ]
+        
+        read_only_fields = [
+            'owner',
+            'total_views',
+            'created',
+            'updated',
+        ]
