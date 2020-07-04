@@ -19,13 +19,15 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 
-class ImageSerializer(serializers.ModelSerializer):
+class ImageSerializer(serializers.HyperlinkedModelSerializer):
     owner = serializers.StringRelatedField()
     post = serializers.StringRelatedField()
     category = serializers.SlugRelatedField(
         slug_field='slug',
         queryset=Category.objects.all()
     )
+    url = serializers.HyperlinkedIdentityField(
+        view_name='post:image_user-detail')
 
     class Meta:
         model = Image
@@ -37,7 +39,8 @@ class ImageSerializer(serializers.ModelSerializer):
             'category',
             'image',
             'post',
-            'total_views'
+            'total_views',
+            'url'
         ]
         
         read_only_fields = [
@@ -81,12 +84,19 @@ class PostManageSerializer(serializers.HyperlinkedModelSerializer):
     url = serializers.HyperlinkedIdentityField(
         view_name='post:post_manage-detail')
 
+    images = serializers.HyperlinkedRelatedField(
+        many=True,
+        read_only=True,
+        view_name='post:image_manage-detail'
+    )
+
     class Meta:
         model = Post
         fields = [
             'owner',
             'title',
             'description',
+            'images',
             'is_active',
             'created',
             'updated',
@@ -103,16 +113,24 @@ class PostManageSerializer(serializers.HyperlinkedModelSerializer):
 
 class ImageManageSerializer(serializers.HyperlinkedModelSerializer):
     owner = serializers.StringRelatedField()
+    post = serializers.SlugRelatedField(
+        slug_field='pk',
+        queryset=Post.objects.all()
+    )
+    category = serializers.SlugRelatedField(
+        slug_field='slug',
+        queryset=Category.objects.all()
+    )
     url = serializers.HyperlinkedIdentityField(
-        view_name='post:post_manage-detail')
+        view_name='post:image_manage-detail')
 
     class Meta:
+        model = Image
         fields = [
             'owner',
             'title',
             'owner_description',
             'admin_description',
-            'is_active',
             'category',
             'image',
             'created',
@@ -128,3 +146,13 @@ class ImageManageSerializer(serializers.HyperlinkedModelSerializer):
             'created',
             'updated',
         ]
+
+
+    def to_representation(self, instance):
+        """Convert `username` to lowercase."""
+
+        ret = super().to_representation(instance)
+        post_pk = ret['post']
+        post = Post.objects.get(pk=post_pk)
+        ret['post'] = str(post)
+        return ret

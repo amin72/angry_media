@@ -7,7 +7,8 @@ app_name = 'post'
 
 router = DefaultRouter()
 router.register('images', views.ImageUserViewSet, basename='image_user')
-router.register('post_manage', views.PostManageViewSet, basename='post_manage')
+router.register('images_manage', views.ImageManageViewSet, basename='image_manage')
+router.register('posts_manage', views.PostManageViewSet, basename='post_manage')
 
 
 urlpatterns = [

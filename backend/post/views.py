@@ -5,13 +5,14 @@ from rest_framework import generics
 from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.exceptions import PermissionDenied
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 
 from .models import Post, Image, Category
 from .serializers import (
-    ImageSerializer,
-    PostSerializer,
     CategorySerializer,
+    ImageSerializer,
+    ImageManageSerializer,
+    PostSerializer,
     PostManageSerializer
 )
 from .paginations import StandardPagination
@@ -70,8 +71,41 @@ class PostManageViewSet(viewsets.ModelViewSet):
 
     queryset = Post.objects.all()
     serializer_class = PostManageSerializer
+    permission_classes = [IsAdminUser]
     pagination_class = StandardPagination
 
     def perform_create(self, serializer):
         # set post's owner
         serializer.save(owner=self.request.user)
+
+
+
+class ImageManageViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint for listing, creating, updating and deleting images.
+    """
+
+    serializer_class = ImageManageSerializer
+    permission_classes = [IsAdminUser]
+    pagination_class = StandardPagination
+
+    def perform_create(self, serializer):
+        # set image's owner
+        serializer.save(owner=self.request.user)
+        
+    def get_queryset(self):
+        """
+        Filter queryset by given `active` paramter.
+        if active == 'yes' only return images which are assigned to a post,
+        if active == 'no' only return images that aren't assigned to any posts.
+        """
+
+        active = self.request.query_params.get('active', None)
+        if active:
+            if active == 'yes':
+                queryset = Image.objects.filter(post__isnull=False)
+            elif active == 'no':
+                queryset = Image.objects.filter(post__isnull=True)
+            return queryset
+        
+        return Image.objects.all()
