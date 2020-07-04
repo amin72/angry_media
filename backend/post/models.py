@@ -98,7 +98,6 @@ class Image(models.Model):
         height_field='image_height',
         width_field='image_width')
     
-    is_active = models.BooleanField(_("is active"), default=False)
     total_views = models.PositiveIntegerField(_("total views"), default=0)
     created = models.DateTimeField(_("create"), auto_now_add=True)
     updated = models.DateTimeField(_("create"), auto_now=True)
