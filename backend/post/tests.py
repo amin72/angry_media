@@ -17,12 +17,14 @@ User = get_user_model()
 
 static_dir = settings.STATIC_ROOT
 
+
 def create_image():
     """Create image object for post by given image path"""
 
     image_path = os.path.join(static_dir, 'img/test_image.png')
+    filename = os.path.split(image_path)[1]
 
-    image = SimpleUploadedFile(name='test_image.png',
+    image = SimpleUploadedFile(name=filename,
         content=open(image_path, 'rb').read(),
         content_type='image/png')
 
@@ -274,7 +276,6 @@ class ImageAPITests(APITestCase):
         # 401 - unauthorized
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
-
         # authenticate user
         self.client.login(**self.user_info)
 
@@ -298,15 +299,17 @@ class ImageAPITests(APITestCase):
         # authenticate user
         self.client.login(**self.user_info)
 
-        image = Image.objects.filter(
-            owner__username=self.user.username).first()
-        url = reverse('post:image_user-detail', kwargs={'pk': image.pk})
-
         # update image (patch)
         for i in range(10):
             data = {
                 'image': create_image()
             }
+
+            image = Image.objects.filter(
+            owner__username=self.user.username).first()
+            url = reverse('post:image_user-detail', kwargs={'pk': image.pk})
+
+            remove_file(image.image.path)
             response = self.client.patch(url, data)
             # 200 - OK
             self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -444,11 +447,11 @@ class ImageAPITests(APITestCase):
         # authenticate user
         self.client.login(**self.user_info)
 
-        image = Image.objects.filter(
-            owner__username=self.user.username).first()
-        url = reverse('post:image_user-detail', kwargs={'pk': image.pk})
-
         for i in range(10):
+            image = Image.objects.filter(
+                owner__username=self.user.username).first()
+            url = reverse('post:image_user-detail', kwargs={'pk': image.pk})
+
             # remove old image file
             remove_file(image.image.path)
             data = {
@@ -500,7 +503,6 @@ class ImageAPITests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
 
-
     def test_update_via_put_method_one_field_not_set(self):
         """
         Test updating Image objects.
@@ -550,15 +552,17 @@ class ImageAPITests(APITestCase):
         response = self.client.delete(url)
         # 204 - No content
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        
+        # remove image file of delete Image object
+        remove_file(image.image.path)
 
         # we must have zero Image object in database
         self.assertEqual(Image.objects.count(), 2)
 
 
-
     def tearDown(self):
         """Remove image files"""
-        
+
         images = Image.objects.all()
         for image in images:
             remove_file(image.image.path)
