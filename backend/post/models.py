@@ -102,11 +102,6 @@ class Image(models.Model):
     created = models.DateTimeField(_("create"), auto_now_add=True)
     updated = models.DateTimeField(_("create"), auto_now=True)
 
-    def save(self, *args, **kwargs):
-        print(args)
-        print(kwargs)
-        return super().save(*args, **kwargs)
-
     def __str__(self):
         return f'{self.id} - {self.owner.username}'
 
