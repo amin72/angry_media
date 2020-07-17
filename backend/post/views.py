@@ -17,6 +17,7 @@ from .serializers import (
 )
 from .paginations import StandardPagination
 from .permissions import IsAuthorOrReadyOnly, IsOwnerAllowedToEditImage
+from .throttles import ImageDayRateThrottle
 
 
 class CategoryListAPIView(generics.ListAPIView):
@@ -52,6 +53,7 @@ class ImageUserViewSet(viewsets.ModelViewSet):
         IsOwnerAllowedToEditImage
     ]
     pagination_class = StandardPagination
+    throttle_classes = [ImageDayRateThrottle]
 
     def perform_create(self, serializer):
         # set image's owner
