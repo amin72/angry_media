@@ -36,3 +36,17 @@
     transform: rotate(360deg);
   }
 }
+
+
+.card-height {
+  height: 450px;
+}
+
+.card-edge {
+  border-radius: 25px !important;
+}
+
+.image-edge {
+  border-top-left-radius: 25px;
+  border-top-right-radius: 25px;
+}

@@ -1,12 +1,16 @@
-import React from 'react';
-import './App.css';
+import React, { Fragment } from 'react'
+import './App.css'
 
-function App() {
+import Posts from './components/posts/Posts'
+import Header from './components/layout/header/Header'
+
+const App = () => {
   return (
-    <div className="App">
-      App
-    </div>
-  );
+    <Fragment>
+      <Header />
+      <Posts />
+    </Fragment>
+  )
 }
 
-export default App;
+export default App
