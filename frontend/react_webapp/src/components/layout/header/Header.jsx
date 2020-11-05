@@ -79,6 +79,9 @@ const useStyles = makeStyles((theme) => ({
       display: 'none',
     },
   },
+  appBar: {
+    marginBottom: 20
+  }
 }))
 
 export default function PrimarySearchAppBar() {
@@ -156,7 +159,7 @@ export default function PrimarySearchAppBar() {
 
   return (
     <div className={classes.grow}>
-      <AppBar position="static">
+      <AppBar position="static" className={classes.appBar}>
         <Toolbar>
           <IconButton
             edge="start"
